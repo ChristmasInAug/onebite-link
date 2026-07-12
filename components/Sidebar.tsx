@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import DeleteFolderModal from "@/components/DeleteFolderModal";
-import { FolderIcon, TrashIcon } from "@/components/icons";
+import RenameFolderModal from "@/components/RenameFolderModal";
+import { FolderIcon, PencilIcon, TrashIcon } from "@/components/icons";
 import { useFolders } from "@/lib/folders-context";
 import type { LinkFolder } from "@/lib/types";
 
@@ -28,6 +29,7 @@ export default function Sidebar({ folders }: SidebarProps) {
   const [folderToDelete, setFolderToDelete] = useState<LinkFolder | null>(
     null,
   );
+  const [folderToEdit, setFolderToEdit] = useState<LinkFolder | null>(null);
 
   function handleConfirmDelete(folder: LinkFolder) {
     removeFolder(folder.id);
@@ -64,23 +66,42 @@ export default function Sidebar({ folders }: SidebarProps) {
                   {folder.count}
                 </span>
               </Link>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setFolderToDelete(folder);
-                }}
-                aria-label={`${folder.name} 폴더 삭제`}
-                className={[
-                  "absolute top-1/2 right-2 hidden -translate-y-1/2 rounded-md p-1 transition-colors group-hover:block",
-                  active
-                    ? "text-white/70 hover:text-white"
-                    : "text-[var(--text-sub)] hover:text-[var(--error)]",
-                ].join(" ")}
-              >
-                <TrashIcon className="size-4" />
-              </button>
+              <div className="absolute top-1/2 right-2 hidden -translate-y-1/2 items-center gap-0.5 group-hover:flex">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setFolderToEdit(folder);
+                  }}
+                  aria-label={`${folder.name} 폴더 이름 수정`}
+                  className={[
+                    "rounded-md p-1 transition-colors",
+                    active
+                      ? "text-white/70 hover:text-white"
+                      : "text-[var(--text-sub)] hover:text-[var(--text)]",
+                  ].join(" ")}
+                >
+                  <PencilIcon className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setFolderToDelete(folder);
+                  }}
+                  aria-label={`${folder.name} 폴더 삭제`}
+                  className={[
+                    "rounded-md p-1 transition-colors",
+                    active
+                      ? "text-white/70 hover:text-white"
+                      : "text-[var(--text-sub)] hover:text-[var(--error)]",
+                  ].join(" ")}
+                >
+                  <TrashIcon className="size-4" />
+                </button>
+              </div>
             </div>
           );
         })}
@@ -90,6 +111,11 @@ export default function Sidebar({ folders }: SidebarProps) {
         folder={folderToDelete}
         onCancel={() => setFolderToDelete(null)}
         onConfirm={handleConfirmDelete}
+      />
+      <RenameFolderModal
+        key={folderToEdit?.id ?? "none"}
+        folder={folderToEdit}
+        onClose={() => setFolderToEdit(null)}
       />
     </aside>
   );
