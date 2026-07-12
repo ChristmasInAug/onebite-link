@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { useFolders } from "@/lib/folders-context";
+import { useLinks } from "@/lib/links-context";
 
 type AppShellProps = {
   children: ReactNode;
@@ -11,12 +12,18 @@ type AppShellProps = {
 
 export default function AppShell({ children }: AppShellProps) {
   const { folders } = useFolders();
+  const { links } = useLinks();
+
+  const foldersWithCounts = folders.map((folder) => ({
+    ...folder,
+    count: links.filter((link) => link.folderId === folder.id).length,
+  }));
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-[var(--background)]">
       <Header />
       <div className="flex flex-1">
-        <Sidebar folders={folders} />
+        <Sidebar folders={foldersWithCounts} />
         <main className="mx-auto w-full max-w-[1000px] flex-1 px-6 py-10">
           {children}
         </main>

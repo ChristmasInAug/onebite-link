@@ -1,18 +1,56 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import type { LinkFolder } from "@/lib/types";
+import { useFolders } from "@/lib/folders-context";
+import { useLinks } from "@/lib/links-context";
 
-type NewLinkFormProps = {
-  folders: LinkFolder[];
+type OgResponse = {
+  url?: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  error?: string;
 };
 
-export default function NewLinkForm({ folders }: NewLinkFormProps) {
+export default function NewLinkForm() {
+  const router = useRouter();
+  const { folders } = useFolders();
+  const { addLink } = useLinks();
+
   const [url, setUrl] = useState("");
   const [folderId, setFolderId] = useState(folders[0]?.id ?? "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!url.trim() || !folderId || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/og?url=${encodeURIComponent(url)}`);
+      const og: OgResponse = await response.json();
+
+      if (!response.ok) {
+        throw new Error(og.error ?? "failed to fetch link");
+      }
+
+      addLink({
+        url: og.url ?? url,
+        title: og.title ?? url,
+        description: og.description ?? "",
+        thumbnail: og.image,
+        folderId,
+      });
+
+      router.push("/");
+    } catch {
+      setError("링크 정보를 가져오지 못했어요. 주소를 확인해 주세요.");
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -65,11 +103,14 @@ export default function NewLinkForm({ folders }: NewLinkFormProps) {
         </select>
       </div>
 
+      {error && <p className="text-sm text-[var(--error)]">{error}</p>}
+
       <button
         type="submit"
-        className="rounded-full bg-[var(--accent)] px-6 py-3 text-[17px] font-medium text-white transition-colors hover:bg-[var(--accent-hover)]"
+        disabled={isSubmitting}
+        className="rounded-full bg-[var(--accent)] px-6 py-3 text-[17px] font-medium text-white transition-colors hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        저장
+        {isSubmitting ? "확인 중..." : "확인"}
       </button>
     </form>
   );
