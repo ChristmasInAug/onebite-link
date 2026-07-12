@@ -20,14 +20,14 @@ export default function NewLinkForm({ folders }: NewLinkFormProps) {
       onSubmit={handleSubmit}
       className="mx-auto flex max-w-lg flex-col gap-6"
     >
-      <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+      <h1 className="text-2xl font-semibold tracking-[-0.3px] text-[var(--text)]">
         새 링크 추가
       </h1>
 
       <div className="flex flex-col gap-2">
         <label
           htmlFor="url"
-          className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="text-sm font-medium text-[var(--text)]"
         >
           링크 주소
         </label>
@@ -39,14 +39,14 @@ export default function NewLinkForm({ folders }: NewLinkFormProps) {
           placeholder="https://example.com"
           value={url}
           onChange={(event) => setUrl(event.target.value)}
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-zinc-600"
+          className="rounded-[10px] border border-[var(--border)] bg-[var(--background)] px-4 py-3 text-[17px] text-[var(--text)] outline-none transition-shadow placeholder:text-[var(--placeholder)] focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.2)]"
         />
       </div>
 
       <div className="flex flex-col gap-2">
         <label
           htmlFor="folder"
-          className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="text-sm font-medium text-[var(--text)]"
         >
           폴더
         </label>
@@ -55,7 +55,7 @@ export default function NewLinkForm({ folders }: NewLinkFormProps) {
           name="folder"
           value={folderId}
           onChange={(event) => setFolderId(event.target.value)}
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-zinc-600"
+          className="rounded-[10px] border border-[var(--border)] bg-[var(--background)] px-4 py-3 text-[17px] text-[var(--text)] outline-none transition-shadow focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.2)]"
         >
           {folders.map((folder) => (
             <option key={folder.id} value={folder.id}>
@@ -67,7 +67,7 @@ export default function NewLinkForm({ folders }: NewLinkFormProps) {
 
       <button
         type="submit"
-        className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className="rounded-full bg-[var(--accent)] px-6 py-3 text-[17px] font-medium text-white transition-colors hover:bg-[var(--accent-hover)]"
       >
         저장
       </button>
