@@ -1,13 +1,17 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
-import { folders } from "@/lib/mock-data";
+import { useFolders } from "@/lib/folders-context";
 
 type AppShellProps = {
   children: ReactNode;
 };
 
 export default function AppShell({ children }: AppShellProps) {
+  const { folders } = useFolders();
+
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-[var(--background)]">
       <Header />

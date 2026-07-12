@@ -1,18 +1,24 @@
-import { notFound } from "next/navigation";
+"use client";
+
+import { useParams } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import LinkGrid from "@/components/LinkGrid";
-import { folders, links } from "@/lib/mock-data";
+import { useFolders } from "@/lib/folders-context";
+import { links } from "@/lib/mock-data";
 
-type FolderPageProps = {
-  params: Promise<{ folderId: string }>;
-};
-
-export default async function FolderPage({ params }: FolderPageProps) {
-  const { folderId } = await params;
+export default function FolderPage() {
+  const { folderId } = useParams<{ folderId: string }>();
+  const { folders } = useFolders();
   const folder = folders.find((item) => item.id === folderId);
 
   if (!folder) {
-    notFound();
+    return (
+      <AppShell>
+        <p className="py-20 text-center text-sm text-[var(--text-sub)]">
+          폴더를 찾을 수 없어요.
+        </p>
+      </AppShell>
+    );
   }
 
   const folderLinks = links.filter((link) => link.folderId === folderId);
