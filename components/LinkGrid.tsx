@@ -1,4 +1,9 @@
+"use client";
+
+import { useState } from "react";
+import DeleteLinkModal from "@/components/DeleteLinkModal";
 import LinkCard from "@/components/LinkCard";
+import { useLinks } from "@/lib/links-context";
 import type { LinkItem } from "@/lib/types";
 
 type LinkGridProps = {
@@ -6,6 +11,14 @@ type LinkGridProps = {
 };
 
 export default function LinkGrid({ links }: LinkGridProps) {
+  const { removeLink } = useLinks();
+  const [linkToDelete, setLinkToDelete] = useState<LinkItem | null>(null);
+
+  function handleConfirmDelete(link: LinkItem) {
+    removeLink(link.id);
+    setLinkToDelete(null);
+  }
+
   if (links.length === 0) {
     return (
       <p className="py-20 text-center text-sm text-[var(--text-sub)]">
@@ -15,10 +28,22 @@ export default function LinkGrid({ links }: LinkGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {links.map((link) => (
-        <LinkCard key={link.id} link={link} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {links.map((link) => (
+          <LinkCard
+            key={link.id}
+            link={link}
+            onDeleteRequest={setLinkToDelete}
+          />
+        ))}
+      </div>
+
+      <DeleteLinkModal
+        link={linkToDelete}
+        onCancel={() => setLinkToDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
+    </>
   );
 }
