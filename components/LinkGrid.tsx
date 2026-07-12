@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import DeleteLinkModal from "@/components/DeleteLinkModal";
+import EditLinkModal from "@/components/EditLinkModal";
 import LinkCard from "@/components/LinkCard";
 import { useLinks } from "@/lib/links-context";
 import type { LinkItem } from "@/lib/types";
@@ -13,6 +14,7 @@ type LinkGridProps = {
 export default function LinkGrid({ links }: LinkGridProps) {
   const { removeLink } = useLinks();
   const [linkToDelete, setLinkToDelete] = useState<LinkItem | null>(null);
+  const [linkToEdit, setLinkToEdit] = useState<LinkItem | null>(null);
 
   function handleConfirmDelete(link: LinkItem) {
     removeLink(link.id);
@@ -34,6 +36,7 @@ export default function LinkGrid({ links }: LinkGridProps) {
           <LinkCard
             key={link.id}
             link={link}
+            onEditRequest={setLinkToEdit}
             onDeleteRequest={setLinkToDelete}
           />
         ))}
@@ -43,6 +46,11 @@ export default function LinkGrid({ links }: LinkGridProps) {
         link={linkToDelete}
         onCancel={() => setLinkToDelete(null)}
         onConfirm={handleConfirmDelete}
+      />
+      <EditLinkModal
+        key={linkToEdit?.id ?? "none"}
+        link={linkToEdit}
+        onClose={() => setLinkToEdit(null)}
       />
     </>
   );

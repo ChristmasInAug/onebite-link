@@ -1,12 +1,17 @@
-import { ExternalLinkIcon, TrashIcon } from "@/components/icons";
+import { ExternalLinkIcon, PencilIcon, TrashIcon } from "@/components/icons";
 import type { LinkItem } from "@/lib/types";
 
 type LinkCardProps = {
   link: LinkItem;
+  onEditRequest: (link: LinkItem) => void;
   onDeleteRequest: (link: LinkItem) => void;
 };
 
-export default function LinkCard({ link, onDeleteRequest }: LinkCardProps) {
+export default function LinkCard({
+  link,
+  onEditRequest,
+  onDeleteRequest,
+}: LinkCardProps) {
   const hostname = new URL(link.url).hostname;
 
   return (
@@ -16,18 +21,32 @@ export default function LinkCard({ link, onDeleteRequest }: LinkCardProps) {
       rel="noopener noreferrer"
       className="group relative flex flex-col overflow-hidden rounded-xl bg-[var(--surface)] shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
     >
-      <button
-        type="button"
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          onDeleteRequest(link);
-        }}
-        aria-label={`${link.title} 링크 삭제`}
-        className="absolute top-2 right-2 z-10 hidden rounded-md bg-[var(--background)]/90 p-1.5 text-[var(--text-sub)] shadow-sm transition-colors group-hover:block hover:text-[var(--error)]"
-      >
-        <TrashIcon className="size-4" />
-      </button>
+      <div className="absolute top-2 right-2 z-10 hidden items-center gap-1 group-hover:flex">
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            onEditRequest(link);
+          }}
+          aria-label={`${link.title} 링크 수정`}
+          className="rounded-md bg-[var(--background)]/90 p-1.5 text-[var(--text-sub)] shadow-sm transition-colors hover:text-[var(--text)]"
+        >
+          <PencilIcon className="size-4" />
+        </button>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            onDeleteRequest(link);
+          }}
+          aria-label={`${link.title} 링크 삭제`}
+          className="rounded-md bg-[var(--background)]/90 p-1.5 text-[var(--text-sub)] shadow-sm transition-colors hover:text-[var(--error)]"
+        >
+          <TrashIcon className="size-4" />
+        </button>
+      </div>
       {link.thumbnail && (
         // eslint-disable-next-line @next/next/no-img-element -- thumbnails come from arbitrary external hosts, unsuitable for next/image's remote allowlist
         <img

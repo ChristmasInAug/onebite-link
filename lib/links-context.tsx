@@ -12,10 +12,17 @@ type NewLinkInput = {
   folderId: string;
 };
 
+type LinkEditableFields = {
+  title: string;
+  description: string;
+  folderId: string;
+};
+
 type LinksContextValue = {
   links: LinkItem[];
   addLink: (input: NewLinkInput) => void;
   removeLink: (id: string) => void;
+  updateLink: (id: string, updates: LinkEditableFields) => void;
 };
 
 const LinksContext = createContext<LinksContextValue | null>(null);
@@ -35,8 +42,28 @@ export function LinksProvider({ children }: { children: ReactNode }) {
     setLinks((prev) => prev.filter((link) => link.id !== id));
   }
 
+  function updateLink(id: string, updates: LinkEditableFields) {
+    const title = updates.title.trim();
+    if (!title) return;
+
+    setLinks((prev) =>
+      prev.map((link) =>
+        link.id === id
+          ? {
+              ...link,
+              title,
+              description: updates.description.trim(),
+              folderId: updates.folderId,
+            }
+          : link,
+      ),
+    );
+  }
+
   return (
-    <LinksContext.Provider value={{ links, addLink, removeLink }}>
+    <LinksContext.Provider
+      value={{ links, addLink, removeLink, updateLink }}
+    >
       {children}
     </LinksContext.Provider>
   );
