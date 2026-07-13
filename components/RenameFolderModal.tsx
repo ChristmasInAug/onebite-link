@@ -18,11 +18,11 @@ export default function RenameFolderModal({
 
   if (!folder) return null;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!name.trim() || !folder) return;
 
-    renameFolder(folder.id, name);
+    await renameFolder(folder.id, name);
     onClose();
   }
 
