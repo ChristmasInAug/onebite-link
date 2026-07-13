@@ -19,13 +19,13 @@ export default function NewLinkForm() {
   const { addLink } = useLinks();
 
   const [url, setUrl] = useState("");
-  const [folderId, setFolderId] = useState(folders[0]?.id ?? "");
+  const [folderId, setFolderId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!url.trim() || !folderId || isSubmitting) return;
+    if (!url.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
     setError("");
@@ -38,7 +38,7 @@ export default function NewLinkForm() {
         throw new Error(og.error ?? "failed to fetch link");
       }
 
-      addLink({
+      await addLink({
         url: og.url ?? url,
         title: og.title ?? url,
         description: og.description ?? "",
@@ -95,6 +95,7 @@ export default function NewLinkForm() {
           onChange={(event) => setFolderId(event.target.value)}
           className="rounded-[10px] border border-[var(--border)] bg-[var(--background)] px-4 py-3 text-[17px] text-[var(--text)] outline-none transition-shadow focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.2)]"
         >
+          <option value="">선택 안 함</option>
           {folders.map((folder) => (
             <option key={folder.id} value={folder.id}>
               {folder.name}

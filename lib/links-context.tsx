@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { links as initialLinks } from "@/lib/mock-data";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createClient } from "@/utils/supabase/client";
 import type { LinkItem } from "@/lib/types";
 
 type NewLinkInput = {
@@ -20,7 +20,7 @@ type LinkEditableFields = {
 
 type LinksContextValue = {
   links: LinkItem[];
-  addLink: (input: NewLinkInput) => void;
+  addLink: (input: NewLinkInput) => Promise<void>;
   removeLink: (id: string) => void;
   updateLink: (id: string, updates: LinkEditableFields) => void;
 };
@@ -28,12 +28,57 @@ type LinksContextValue = {
 const LinksContext = createContext<LinksContextValue | null>(null);
 
 export function LinksProvider({ children }: { children: ReactNode }) {
-  const [links, setLinks] = useState<LinkItem[]>(initialLinks);
+  const [links, setLinks] = useState<LinkItem[]>([]);
 
-  function addLink(input: NewLinkInput) {
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function fetchLinks() {
+      const { data, error } = await supabase
+        .from("links")
+        .select("id, url, title, description, thumbnail_url, folder_id")
+        .order("created_at", { ascending: false });
+
+      if (error || !data) return;
+
+      setLinks(
+        data.map((row) => ({
+          id: String(row.id),
+          title: row.title ?? row.url,
+          url: row.url,
+          description: row.description ?? "",
+          thumbnail: row.thumbnail_url ?? undefined,
+          folderId: row.folder_id ? String(row.folder_id) : "",
+        })),
+      );
+    }
+
+    fetchLinks();
+  }, []);
+
+  async function addLink(input: NewLinkInput) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("links")
+      .insert({
+        url: input.url,
+        title: input.title,
+        description: input.description,
+        thumbnail_url: input.thumbnail ?? null,
+        folder_id: input.folderId ? Number(input.folderId) : null,
+      })
+      .select("id, url, title, description, thumbnail_url, folder_id")
+      .single();
+
+    if (error || !data) return;
+
     const newLink: LinkItem = {
-      id: crypto.randomUUID(),
-      ...input,
+      id: String(data.id),
+      title: data.title ?? data.url,
+      url: data.url,
+      description: data.description ?? "",
+      thumbnail: data.thumbnail_url ?? undefined,
+      folderId: data.folder_id ? String(data.folder_id) : "",
     };
     setLinks((prev) => [newLink, ...prev]);
   }
