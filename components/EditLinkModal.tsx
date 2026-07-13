@@ -20,11 +20,11 @@ export default function EditLinkModal({ link, onClose }: EditLinkModalProps) {
 
   if (!link) return null;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!title.trim() || !link) return;
 
-    updateLink(link.id, { title, description, folderId });
+    await updateLink(link.id, { title, description, folderId });
     onClose();
   }
 
@@ -59,6 +59,7 @@ export default function EditLinkModal({ link, onClose }: EditLinkModalProps) {
               onChange={(event) => setFolderId(event.target.value)}
               className="rounded-[10px] border border-[var(--border)] bg-[var(--background)] px-4 py-3 text-[17px] text-[var(--text)] outline-none transition-shadow focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.2)]"
             >
+              <option value="">선택 안 함</option>
               {folders.map((folder) => (
                 <option key={folder.id} value={folder.id}>
                   {folder.name}
