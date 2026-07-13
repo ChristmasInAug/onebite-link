@@ -16,8 +16,8 @@ export default function LinkGrid({ links }: LinkGridProps) {
   const [linkToDelete, setLinkToDelete] = useState<LinkItem | null>(null);
   const [linkToEdit, setLinkToEdit] = useState<LinkItem | null>(null);
 
-  function handleConfirmDelete(link: LinkItem) {
-    removeLink(link.id);
+  async function handleConfirmDelete(link: LinkItem) {
+    await removeLink(link.id);
     setLinkToDelete(null);
   }
 

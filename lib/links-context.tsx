@@ -21,7 +21,7 @@ type LinkEditableFields = {
 type LinksContextValue = {
   links: LinkItem[];
   addLink: (input: NewLinkInput) => Promise<void>;
-  removeLink: (id: string) => void;
+  removeLink: (id: string) => Promise<void>;
   updateLink: (id: string, updates: LinkEditableFields) => Promise<void>;
 };
 
@@ -83,7 +83,12 @@ export function LinksProvider({ children }: { children: ReactNode }) {
     setLinks((prev) => [newLink, ...prev]);
   }
 
-  function removeLink(id: string) {
+  async function removeLink(id: string) {
+    const supabase = createClient();
+    const { error } = await supabase.from("links").delete().eq("id", id);
+
+    if (error) return;
+
     setLinks((prev) => prev.filter((link) => link.id !== id));
   }
 
