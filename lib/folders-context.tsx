@@ -1,12 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { folders as initialFolders } from "@/lib/mock-data";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createClient } from "@/utils/supabase/client";
 import type { LinkFolder } from "@/lib/types";
 
 type FoldersContextValue = {
   folders: LinkFolder[];
-  addFolder: (name: string) => void;
+  addFolder: (name: string) => Promise<void>;
   removeFolder: (id: string) => void;
   renameFolder: (id: string, name: string) => void;
 };
@@ -14,17 +14,39 @@ type FoldersContextValue = {
 const FoldersContext = createContext<FoldersContextValue | null>(null);
 
 export function FoldersProvider({ children }: { children: ReactNode }) {
-  const [folders, setFolders] = useState<LinkFolder[]>(initialFolders);
+  const [folders, setFolders] = useState<LinkFolder[]>([]);
 
-  function addFolder(name: string) {
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function fetchFolders() {
+      const { data, error } = await supabase
+        .from("folders")
+        .select("id, name")
+        .order("id", { ascending: true });
+
+      if (error || !data) return;
+
+      setFolders(data.map((row) => ({ id: String(row.id), name: row.name, count: 0 })));
+    }
+
+    fetchFolders();
+  }, []);
+
+  async function addFolder(name: string) {
     const trimmed = name.trim();
     if (!trimmed) return;
 
-    const newFolder: LinkFolder = {
-      id: crypto.randomUUID(),
-      name: trimmed,
-      count: 0,
-    };
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("folders")
+      .insert({ name: trimmed })
+      .select("id, name")
+      .single();
+
+    if (error || !data) return;
+
+    const newFolder: LinkFolder = { id: String(data.id), name: data.name, count: 0 };
     setFolders((prev) => [...prev, newFolder]);
   }
 

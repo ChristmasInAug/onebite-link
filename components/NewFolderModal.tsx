@@ -14,19 +14,22 @@ export default function NewFolderModal({
 }: NewFolderModalProps) {
   const { addFolder } = useFolders();
   const [name, setName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
   function handleClose() {
     setName("");
+    setIsSubmitting(false);
     onClose();
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || isSubmitting) return;
 
-    addFolder(name);
+    setIsSubmitting(true);
+    await addFolder(name);
     handleClose();
   }
 
@@ -71,15 +74,17 @@ export default function NewFolderModal({
             <button
               type="button"
               onClick={handleClose}
-              className="rounded-full px-5 py-2.5 text-sm font-medium text-[var(--text-sub)] transition-colors hover:bg-[var(--badge-bg)]"
+              disabled={isSubmitting}
+              className="rounded-full px-5 py-2.5 text-sm font-medium text-[var(--text-sub)] transition-colors hover:bg-[var(--badge-bg)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               취소
             </button>
             <button
               type="submit"
-              className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-hover)]"
+              disabled={isSubmitting}
+              className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              저장
+              {isSubmitting ? "저장 중..." : "저장"}
             </button>
           </div>
         </form>
