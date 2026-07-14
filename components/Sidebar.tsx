@@ -124,6 +124,13 @@ export default function Sidebar({ folders }: SidebarProps) {
         로그아웃
       </button>
 
+      <Link
+        href="/privacy"
+        className="mt-1 px-3 py-1 text-xs text-[var(--placeholder)] transition-colors hover:text-[var(--text-sub)]"
+      >
+        개인정보 처리방침
+      </Link>
+
       <DeleteFolderModal
         folder={folderToDelete}
         onCancel={() => setFolderToDelete(null)}
