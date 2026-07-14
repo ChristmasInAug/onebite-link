@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import DeleteFolderModal from "@/components/DeleteFolderModal";
 import RenameFolderModal from "@/components/RenameFolderModal";
-import { FolderIcon, PencilIcon, TrashIcon } from "@/components/icons";
+import { FolderIcon, LogOutIcon, PencilIcon, TrashIcon } from "@/components/icons";
 import { useFolders } from "@/lib/folders-context";
+import { createClient } from "@/utils/supabase/client";
 import type { LinkFolder } from "@/lib/types";
 
 type SidebarProps = {
@@ -39,8 +40,15 @@ export default function Sidebar({ folders }: SidebarProps) {
     }
   }
 
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
   return (
-    <aside className="w-56 shrink-0 border-r border-[var(--divider)] p-4">
+    <aside className="flex w-56 shrink-0 flex-col border-r border-[var(--divider)] p-4">
       <nav className="flex flex-col gap-1">
         <Link href="/" className={navItemClass(pathname === "/")}>
           All
@@ -106,6 +114,15 @@ export default function Sidebar({ folders }: SidebarProps) {
           );
         })}
       </nav>
+
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="mt-auto flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-sub)] transition-colors hover:bg-[var(--badge-bg)] hover:text-[var(--text)]"
+      >
+        <LogOutIcon className="size-4 shrink-0" />
+        로그아웃
+      </button>
 
       <DeleteFolderModal
         folder={folderToDelete}
