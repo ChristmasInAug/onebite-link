@@ -34,7 +34,18 @@ export const updateSession = async (request: NextRequest) => {
   );
 
   // Refresh the auth token so it's kept alive across requests
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const path = request.nextUrl.pathname
+  const isProtectedRoute = path === "/" || path === "/new" || path.startsWith("/folder")
+
+  if (isProtectedRoute && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = "/login"
+    return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 };
